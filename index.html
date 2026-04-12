@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Cor da barra do Chrome (Android) -->
+<meta name="theme-color" content="#80808022">
+
+<!-- Opcional (iPhone / estilo app) -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Visita Angola - Login</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  height: 100vh;
+  background: url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf') no-repeat center center/cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* Overlay escuro */
+body::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+}
+
+/* Container */
+.container {
+  position: relative;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  padding: 25px;
+  border-radius: 18px;
+  width: 90%;
+  max-width: 340px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  color: white;
+}
+
+/* Logo / título */
+.logo {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.logo h1 {
+  font-size: 22px;
+  color: #facc15;
+}
+
+.logo p {
+  font-size: 12px;
+  color: #ddd;
+}
+
+/* Inputs */
+.input-box {
+  margin-bottom: 12px;
+  position: relative;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+
+/* Botão */
+button {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(135deg, #d62828, #9d0208);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+/* Divider */
+.divider {
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #aaa;
+}
+
+.divider span {
+  margin: 0 8px;
+  font-size: 12px;
+  color: #ccc;
+}
+
+/* Google */
+.social-btn {
+  background: white;
+  color: black;
+}
+
+/* Toggle */
+.toggle {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  cursor: pointer;
+  color: black;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="logo">
+    <h1>Visita Angola 🇦🇴</h1>
+    <p>Descobre a beleza de Angola</p>
+  </div>
+
+  <div class="input-box">
+    <input type="email" id="email" placeholder="Email">
+  </div>
+
+  <div class="input-box">
+    <input type="password" id="senha" placeholder="Palavra-passe">
+    <span class="toggle" onclick="mostrarSenha()">👁️</span>
+  </div>
+
+  <button onclick="login()">Entrar</button>
+
+  <div class="divider">
+    <span>ou</span>
+  </div>
+
+  <button class="social-btn" onclick="loginGoogle()">
+    Continuar com Google
+  </button>
+
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA6tnv1httnE_JUDEPEs1Rd20N8xAOhm54",
+  authDomain: "meu-app-ec557.firebaseapp.com",
+  projectId: "meu-app-ec557",
+  storageBucket: "meu-app-ec557.firebasestorage.app",
+  messagingSenderId: "647319948154",
+  appId: "1:647319948154:web:de9864227e0ea471e8a4c3"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    window.location.href = "principal.html";
+  }
+});
+
+function mostrarSenha() {
+  let senha = document.getElementById("senha");
+  senha.type = senha.type === "password" ? "text" : "password";
+}
+
+function login() {
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
+
+  if (!email || !senha) {
+    alert("Preencha todos os campos!");
+    return;
+  }
+
+  auth.signInWithEmailAndPassword(email, senha)
+    .then(() => {
+      window.location.href = "principal.html";
+    })
+    .catch((e) => {
+
+      if (e.code === "auth/user-not-found") {
+        alert("Ainda não tens uma conta.\nContinua com o Google.");
+
+      } else if (e.code === "auth/wrong-password") {
+        alert("Palavra-passe incorreta!");
+
+      } else if (e.code === "auth/invalid-email") {
+        alert("Email inválido!");
+
+      } else {
+        alert("Erro ao entrar.");
+      }
+
+    });
+}
+
+function loginGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  auth.signInWithPopup(provider)
+    .then(() => {
+      window.location.href = "principal.html";
+    })
+    .catch(() => {
+      alert("Erro com Google!");
+    });
+}
+</script>
+
+</body>
+</html>
